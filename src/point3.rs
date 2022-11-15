@@ -1,5 +1,5 @@
 use super::Vec3;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point3(pub Vec3);
@@ -22,6 +22,23 @@ impl Add<Vec3> for Point3 {
 impl AddAssign<Vec3> for Point3 {
     fn add_assign(&mut self, rhs: Vec3) {
         self.0 += rhs;
+    }
+}
+
+impl Sub for Point3 {
+    type Output = Vec3;
+
+    fn sub(self, Self(v): Self) -> Self::Output {
+        let Self(u) = self;
+        u - v
+    }
+}
+
+impl Sub<Vec3> for Point3 {
+    type Output = Self;
+
+    fn sub(self, rhs: Vec3) -> Self {
+        self + (-rhs)
     }
 }
 
