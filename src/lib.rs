@@ -1,2 +1,2 @@
-mod vec3;
+pub mod vec3;
 pub use vec3::Vec3;
