@@ -2,6 +2,8 @@ pub mod vec3;
 pub use vec3::Vec3;
 pub mod point3;
 pub use point3::Point3;
+pub mod color;
+pub use color::Color;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
