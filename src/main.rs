@@ -1,9 +1,22 @@
 use lens::*;
 
+fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> bool {
+    let oc = r.origin() - center;
+    let a = vec3::dot(r.direction(), r.direction());
+    let b = 2. * vec3::dot(oc, r.direction());
+    let c = vec3::dot(oc, oc) - radius * radius;
+    let discriminant = b * b - 4. * a * c;
+    discriminant > 0.
+}
+
 fn ray_color(r: &Ray) -> Color {
-    let unit_direction = r.direction().normalize();
-    let t = 0.5 * (unit_direction.y() + 1.);
-    (1. - t) * Color::new(1., 1., 1.) + t * Color::new(0.5, 0.7, 1.)
+    if hit_sphere(Point3::new(0., 0., -1.), 0.5, r) {
+        Color::new(1., 0., 0.)
+    } else {
+        let unit_direction = r.direction().normalize();
+        let t = 0.5 * (unit_direction.y() + 1.);
+        (1. - t) * Color::new(1., 1., 1.) + t * Color::new(0.5, 0.7, 1.)
+    }
 }
 
 fn main() {
