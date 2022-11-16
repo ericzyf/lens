@@ -2,14 +2,15 @@ use lens::*;
 
 fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin() - center;
-    let a = vec3::dot(r.direction(), r.direction());
-    let b = 2. * vec3::dot(oc, r.direction());
-    let c = vec3::dot(oc, oc) - radius * radius;
-    let discriminant = b * b - 4. * a * c;
+    let a = r.direction().length_squared();
+    let hb = vec3::dot(oc, r.direction());
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = hb * hb - a * c;
+
     if discriminant < 0. {
         -1.
     } else {
-        (-b - discriminant.sqrt()) / (2. * a)
+        (-hb - discriminant.sqrt()) / a
     }
 }
 
