@@ -31,11 +31,10 @@ impl Mul<Color> for f64 {
 }
 
 impl From<Color> for image::Rgb<u8> {
-    fn from(c: Color) -> Self {
-        let cv = &c.0;
-        let r = (cv.x() * 255.999) as u8;
-        let g = (cv.y() * 255.999) as u8;
-        let b = (cv.z() * 255.999) as u8;
+    fn from(Color(v): Color) -> Self {
+        let r = (v.x() * 255.999) as u8;
+        let g = (v.y() * 255.999) as u8;
+        let b = (v.z() * 255.999) as u8;
 
         image::Rgb([r, g, b])
     }
