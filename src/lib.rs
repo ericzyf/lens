@@ -31,3 +31,29 @@ impl Ray {
         self.origin() + t * self.direction()
     }
 }
+
+#[derive(Debug, Copy, Clone)]
+pub struct HitRecord {
+    p: Point3,
+    normal: Vec3,
+    t: f64,
+}
+
+impl HitRecord {
+    fn new(p: Point3, normal: Vec3, t: f64) -> HitRecord {
+        debug_assert!(t > 0.);
+        HitRecord { p, normal, t }
+    }
+
+    fn none() -> HitRecord {
+        HitRecord {
+            p: Point3::new(0., 0., 0.),
+            normal: Vec3::new(0., 0., 0.),
+            t: -1.,
+        }
+    }
+
+    fn hitted(&self) -> bool {
+        self.t > 0.
+    }
+}
