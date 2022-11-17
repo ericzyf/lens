@@ -99,7 +99,7 @@ impl AddAssign for Vec3 {
 
 impl MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, t: f64) {
-        for e in self.e.iter_mut() {
+        for e in &mut self.e {
             *e *= t;
         }
     }
@@ -108,7 +108,7 @@ impl MulAssign<f64> for Vec3 {
 impl DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, t: f64) {
         debug_assert!(t != 0.);
-        for e in self.e.iter_mut() {
+        for e in &mut self.e {
             *e /= t;
         }
     }
