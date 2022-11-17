@@ -4,6 +4,8 @@ pub mod point3;
 pub use point3::Point3;
 pub mod color;
 pub use color::Color;
+pub mod sphere;
+pub use sphere::Sphere;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
