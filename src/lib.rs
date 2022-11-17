@@ -39,12 +39,18 @@ pub struct HitRecord {
     p: Point3,
     normal: Vec3,
     t: f64,
+    front_face: bool,
 }
 
 impl HitRecord {
-    fn new(p: Point3, normal: Vec3, t: f64) -> HitRecord {
+    fn new(p: Point3, normal: Vec3, t: f64, front_face: bool) -> HitRecord {
         debug_assert!(t > 0.);
-        HitRecord { p, normal, t }
+        HitRecord {
+            p,
+            normal,
+            t,
+            front_face,
+        }
     }
 
     fn none() -> HitRecord {
@@ -52,6 +58,7 @@ impl HitRecord {
             p: Point3::new(0., 0., 0.),
             normal: Vec3::new(0., 0., 0.),
             t: -1.,
+            front_face: false,
         }
     }
 

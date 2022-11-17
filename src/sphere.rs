@@ -34,6 +34,14 @@ impl Hittable for Sphere {
         }
 
         let hit_point = r.at(root);
-        HitRecord::new(hit_point, (hit_point - self.center) / self.radius, root)
+        let outward_normal = (hit_point - self.center) / self.radius;
+        let front_face = vec3::dot(r.direction(), outward_normal) < 0.;
+        let normal = if front_face {
+            outward_normal
+        } else {
+            -outward_normal
+        };
+
+        HitRecord::new(hit_point, normal, root, front_face)
     }
 }
