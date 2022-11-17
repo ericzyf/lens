@@ -6,6 +6,8 @@ pub mod color;
 pub use color::Color;
 pub mod sphere;
 pub use sphere::Sphere;
+pub mod scene;
+pub use scene::Scene;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -51,6 +53,10 @@ impl HitRecord {
             t,
             front_face,
         }
+    }
+
+    fn t(&self) -> f64 {
+        self.t
     }
 
     fn none() -> HitRecord {
