@@ -1,24 +1,9 @@
 use lens::*;
 
-fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> f64 {
-    let oc = r.origin() - center;
-    let a = r.direction().length_squared();
-    let hb = vec3::dot(oc, r.direction());
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = hb * hb - a * c;
-
-    if discriminant < 0. {
-        -1.
-    } else {
-        (-hb - discriminant.sqrt()) / a
-    }
-}
-
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(Point3::new(0., 0., -1.), 0.5, r);
-    if t > 0. {
-        let n = (r.at(t) - Point3::new(0., 0., -1.)).normalize();
-        Color(0.5 * (n + Vec3::new(1., 1., 1.)))
+fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
+    let hit_rec = world.hit(r, 0., f64::INFINITY);
+    if hit_rec.hitted() {
+        0.5 * (Color(hit_rec.normal()) + Color::new(1., 1., 1.))
     } else {
         let unit_direction = r.direction().normalize();
         let t = 0.5 * (unit_direction.y() + 1.);
@@ -31,6 +16,14 @@ fn main() {
     let aspect_ratio = 16. / 9.;
     let image_width = 1280;
     let image_height = ((image_width as f64) / aspect_ratio) as u32;
+
+    // World
+    let world = Scene {
+        objects: vec![
+            Sphere::new(Point3::new(0., 0., -1.), 0.5),
+            Sphere::new(Point3::new(0., -100.5, -1.), 100.),
+        ],
+    };
 
     // Camera
     let viewport_height = 2.;
@@ -49,10 +42,10 @@ fn main() {
         let u = (x as f64) / ((image_width as f64) - 1.);
         let v = (y as f64) / ((image_height as f64) - 1.);
 
-        *pixel = image::Rgb::from(ray_color(&Ray::new(
-            origin,
-            ll_corner + u * horizontal + v * vertical - origin,
-        )));
+        *pixel = image::Rgb::from(ray_color(
+            &Ray::new(origin, ll_corner + u * horizontal + v * vertical - origin),
+            &world,
+        ));
     }
 
     image::imageops::flip_vertical(&imgbuf)
