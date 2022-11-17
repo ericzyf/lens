@@ -57,3 +57,7 @@ impl HitRecord {
         self.t > 0.
     }
 }
+
+pub trait Hittable {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> HitRecord;
+}
