@@ -1,6 +1,18 @@
 use image::{ImageBuffer, Rgb};
 use lens::*;
+use rand::distributions::{Distribution, Uniform};
 use rayon::prelude::*;
+
+fn rand_displacement(spp: usize) -> Vec<(f64, f64)> {
+    let range = Uniform::new(0., 1.);
+    let mut rng = rand::thread_rng();
+
+    let mut dp = Vec::with_capacity(spp);
+    for _ in 0..spp {
+        dp.push((range.sample(&mut rng), range.sample(&mut rng)));
+    }
+    dp
+}
 
 fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
     let hit_rec = world.hit(r, 0., f64::INFINITY);
@@ -18,6 +30,7 @@ fn main() {
     let aspect_ratio = 16. / 9.;
     let image_width = 1280;
     let image_height = ((image_width as f64) / aspect_ratio) as u32;
+    let samples_per_pixel = 100;
 
     // World
     let world = Scene {
@@ -28,16 +41,10 @@ fn main() {
     };
 
     // Camera
-    let viewport_height = 2.;
-    let viewport_width = aspect_ratio * viewport_height;
-    let focal_length = 1.;
-
-    let origin = Point3::new(0., 0., 0.);
-    let horizontal = Vec3::new(viewport_width, 0., 0.);
-    let vertical = Vec3::new(0., viewport_height, 0.);
-    let ll_corner = origin - horizontal / 2. - vertical / 2. - Vec3::new(0., 0., focal_length);
+    let cam = Camera::new();
 
     let mut imgbuf: ImageBuffer<Rgb<u8>, Vec<_>> = ImageBuffer::new(image_width, image_height);
+    let sample_displacement = rand_displacement(samples_per_pixel);
 
     // Render
     imgbuf
@@ -50,12 +57,20 @@ fn main() {
         .for_each(|(i, p)| {
             let image_width = image_width as usize;
             let (x, y) = (i % image_width, i / image_width);
-            let u = (x as f64) / ((image_width as f64) - 1.);
-            let v = (y as f64) / ((image_height as f64) - 1.);
 
-            let ray = Ray::new(origin, ll_corner + u * horizontal + v * vertical - origin);
-            let Rgb(color) = Rgb::from(ray_color(&ray, &world));
-            p.copy_from_slice(&color);
+            let mut avg_color = Vec3::new(0., 0., 0.);
+            for &(dx, dy) in &sample_displacement {
+                let sx = (x as f64) + dx;
+                let sy = (y as f64) + dy;
+                let u = sx / ((image_width as f64) - 1.);
+                let v = sy / ((image_height as f64) - 1.);
+                let Color(c) = ray_color(&cam.get_ray(u, v), &world);
+                avg_color += c;
+            }
+            avg_color /= sample_displacement.len() as f64;
+
+            let Rgb(pixel_color) = Rgb::from(Color(avg_color));
+            p.copy_from_slice(&pixel_color);
         });
 
     image::imageops::flip_vertical(&imgbuf)
