@@ -8,6 +8,8 @@ pub mod sphere;
 pub use sphere::Sphere;
 pub mod scene;
 pub use scene::Scene;
+pub mod camera;
+pub use camera::Camera;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
