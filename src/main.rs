@@ -1,4 +1,6 @@
+use image::{ImageBuffer, Rgb};
 use lens::*;
+use rayon::prelude::*;
 
 fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
     let hit_rec = world.hit(r, 0., f64::INFINITY);
@@ -35,18 +37,26 @@ fn main() {
     let vertical = Vec3::new(0., viewport_height, 0.);
     let ll_corner = origin - horizontal / 2. - vertical / 2. - Vec3::new(0., 0., focal_length);
 
-    let mut imgbuf = image::ImageBuffer::new(image_width, image_height);
+    let mut imgbuf: ImageBuffer<Rgb<u8>, Vec<_>> = ImageBuffer::new(image_width, image_height);
 
     // Render
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let u = (x as f64) / ((image_width as f64) - 1.);
-        let v = (y as f64) / ((image_height as f64) - 1.);
+    imgbuf
+        .as_flat_samples_mut()
+        .as_view_mut::<Rgb<u8>>()
+        .unwrap()
+        .image_mut_slice()
+        .par_chunks_exact_mut(3)
+        .enumerate()
+        .for_each(|(i, p)| {
+            let image_width = image_width as usize;
+            let (x, y) = (i % image_width, i / image_width);
+            let u = (x as f64) / ((image_width as f64) - 1.);
+            let v = (y as f64) / ((image_height as f64) - 1.);
 
-        *pixel = image::Rgb::from(ray_color(
-            &Ray::new(origin, ll_corner + u * horizontal + v * vertical - origin),
-            &world,
-        ));
-    }
+            let ray = Ray::new(origin, ll_corner + u * horizontal + v * vertical - origin);
+            let Rgb(color) = Rgb::from(ray_color(&ray, &world));
+            p.copy_from_slice(&color);
+        });
 
     image::imageops::flip_vertical(&imgbuf)
         .save("image.png")
