@@ -14,6 +14,18 @@ impl Color {
     }
 }
 
+impl Color {
+    pub fn gamma_correction(self) -> Self {
+        const INV_GAMMA: f64 = 1. / 2.2;
+        let Color(v) = self;
+        Color::new(
+            v.x().powf(INV_GAMMA),
+            v.y().powf(INV_GAMMA),
+            v.z().powf(INV_GAMMA),
+        )
+    }
+}
+
 impl Add for Color {
     type Output = Self;
 

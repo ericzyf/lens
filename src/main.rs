@@ -79,7 +79,7 @@ fn main() {
             }
             avg_color /= sample_displacement.len() as f64;
 
-            let Rgb(pixel_color) = Rgb::from(Color(avg_color));
+            let Rgb(pixel_color) = Rgb::from(Color(avg_color).gamma_correction());
             p.copy_from_slice(&pixel_color);
         });
 
