@@ -58,36 +58,20 @@ impl HitRecord {
     }
 
     pub fn hit_point(&self) -> Point3 {
-        debug_assert!(self.hitted());
         self.p
     }
 
     pub fn normal(&self) -> Vec3 {
-        debug_assert!(self.hitted());
         self.normal
     }
 
     pub fn t(&self) -> f64 {
-        debug_assert!(self.hitted());
         self.t
-    }
-
-    pub fn none() -> HitRecord {
-        HitRecord {
-            p: Point3::new(0., 0., 0.),
-            normal: Vec3::new(0., 0., 0.),
-            t: -1.,
-            front_face: false,
-        }
-    }
-
-    pub fn hitted(&self) -> bool {
-        self.t > 0.
     }
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> HitRecord;
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
 pub fn random_in_unit_sphere() -> Vec3 {

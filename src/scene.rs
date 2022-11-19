@@ -5,14 +5,13 @@ pub struct Scene {
 }
 
 impl Hittable for Scene {
-    fn hit(&self, r: &Ray, t_min: f64, mut t_max: f64) -> HitRecord {
-        let mut closest_hit = HitRecord::none();
+    fn hit(&self, r: &Ray, t_min: f64, mut t_max: f64) -> Option<HitRecord> {
+        let mut closest_hit = None;
 
         for obj in &self.objects {
-            let hit_rec = obj.hit(r, t_min, t_max);
-            if hit_rec.hitted() {
-                t_max = hit_rec.t();
-                closest_hit = hit_rec;
+            if let Some(rec) = obj.hit(r, t_min, t_max) {
+                t_max = rec.t();
+                closest_hit = Some(rec);
             }
         }
 

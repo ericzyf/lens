@@ -12,7 +12,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> HitRecord {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = r.direction().length_squared();
         let hb = vec3::dot(oc, r.direction());
@@ -20,7 +20,7 @@ impl Hittable for Sphere {
 
         let discriminant = hb * hb - a * c;
         if discriminant < 0. {
-            return HitRecord::none();
+            return None;
         }
 
         // Find the nearest root that lies in the acceptable range.
@@ -29,7 +29,7 @@ impl Hittable for Sphere {
         if root < t_min || root > t_max {
             root = (-hb + sqrtd) / a;
             if root < t_min || root > t_max {
-                return HitRecord::none();
+                return None;
             }
         }
 
@@ -42,6 +42,6 @@ impl Hittable for Sphere {
             -outward_normal
         };
 
-        HitRecord::new(hit_point, normal, root, front_face)
+        Some(HitRecord::new(hit_point, normal, root, front_face))
     }
 }

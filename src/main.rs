@@ -20,8 +20,7 @@ fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
         return Color::new(0., 0., 0.);
     }
 
-    let rec = world.hit(r, 0.001, f64::INFINITY);
-    if rec.hitted() {
+    if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
         0.5 * ray_color(
             &Ray::new(rec.hit_point(), rec.normal() + random_unit_vector()),
             world,
