@@ -13,6 +13,7 @@ pub use scene::Scene;
 pub mod camera;
 pub use camera::Camera;
 pub mod material;
+pub use material::{Material, Scatterable};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
@@ -42,16 +43,18 @@ impl Ray {
 pub struct HitRecord {
     p: Point3,
     normal: Vec3,
+    mat: Material,
     t: f64,
     front_face: bool,
 }
 
 impl HitRecord {
-    pub fn new(p: Point3, normal: Vec3, t: f64, front_face: bool) -> HitRecord {
+    pub fn new(p: Point3, normal: Vec3, mat: Material, t: f64, front_face: bool) -> HitRecord {
         debug_assert!(t > 0.);
         HitRecord {
             p,
             normal,
+            mat,
             t,
             front_face,
         }
@@ -67,6 +70,10 @@ impl HitRecord {
 
     pub fn t(&self) -> f64 {
         self.t
+    }
+
+    pub fn scatter(&self, r_in: &Ray) -> Option<(Color, Ray)> {
+        self.mat.scatter(r_in, self)
     }
 }
 

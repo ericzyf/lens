@@ -21,11 +21,11 @@ fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
     }
 
     if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
-        0.5 * ray_color(
-            &Ray::new(rec.hit_point(), rec.normal() + random_unit_vector()),
-            world,
-            depth - 1,
-        )
+        if let Some((attenuation, scattered)) = rec.scatter(r) {
+            attenuation * ray_color(&scattered, world, depth - 1)
+        } else {
+            Color::new(0., 0., 0.)
+        }
     } else {
         let unit_direction = r.direction().normalize();
         let t = 0.5 * (unit_direction.y() + 1.);
@@ -42,10 +42,17 @@ fn main() {
     let max_depth = 50;
 
     // World
+    let material_ground = Material::new_lambertian(Color::new(0.8, 0.8, 0.));
+    let material_center = Material::new_lambertian(Color::new(0.7, 0.3, 0.3));
+    let material_left = Material::new_metal(Color::new(0.8, 0.8, 0.8));
+    let material_right = Material::new_metal(Color::new(0.8, 0.6, 0.2));
+
     let world = Scene {
         objects: vec![
-            Sphere::new(Point3::new(0., 0., -1.), 0.5),
-            Sphere::new(Point3::new(0., -100.5, -1.), 100.),
+            Sphere::new(Point3::new(0., -100.5, -1.), 100., material_ground),
+            Sphere::new(Point3::new(0., 0., -1.), 0.5, material_center),
+            Sphere::new(Point3::new(-1., 0., -1.), 0.5, material_left),
+            Sphere::new(Point3::new(1., 0., -1.), 0.5, material_right),
         ],
     };
 

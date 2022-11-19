@@ -34,6 +34,14 @@ impl Add for Color {
     }
 }
 
+impl Mul for Color {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        Color(self.0 * other.0)
+    }
+}
+
 impl Mul<Color> for f64 {
     type Output = Color;
 
