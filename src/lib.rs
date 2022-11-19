@@ -1,3 +1,5 @@
+use rand::distributions::{Distribution, Uniform};
+
 pub mod vec3;
 pub use vec3::Vec3;
 pub mod point3;
@@ -78,4 +80,20 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> HitRecord;
+}
+
+pub fn random_in_unit_sphere() -> Vec3 {
+    let range = Uniform::new_inclusive(-1., 1.);
+    let mut rng = rand::thread_rng();
+
+    loop {
+        let v = Vec3::new(
+            range.sample(&mut rng),
+            range.sample(&mut rng),
+            range.sample(&mut rng),
+        );
+        if v.length_squared() < 1. {
+            break v;
+        }
+    }
 }
