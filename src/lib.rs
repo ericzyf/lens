@@ -56,11 +56,18 @@ impl HitRecord {
         }
     }
 
+    pub fn hit_point(&self) -> Point3 {
+        debug_assert!(self.hitted());
+        self.p
+    }
+
     pub fn normal(&self) -> Vec3 {
+        debug_assert!(self.hitted());
         self.normal
     }
 
     pub fn t(&self) -> f64 {
+        debug_assert!(self.hitted());
         self.t
     }
 

@@ -14,10 +14,19 @@ fn rand_displacement(spp: usize) -> Vec<(f64, f64)> {
     dp
 }
 
-fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
-    let hit_rec = world.hit(r, 0., f64::INFINITY);
-    if hit_rec.hitted() {
-        0.5 * (Color(hit_rec.normal()) + Color::new(1., 1., 1.))
+fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if depth <= 0 {
+        return Color::new(0., 0., 0.);
+    }
+
+    let rec = world.hit(r, 0.001, f64::INFINITY);
+    if rec.hitted() {
+        0.5 * ray_color(
+            &Ray::new(rec.hit_point(), rec.normal() + random_in_unit_sphere()),
+            world,
+            depth - 1,
+        )
     } else {
         let unit_direction = r.direction().normalize();
         let t = 0.5 * (unit_direction.y() + 1.);
@@ -31,6 +40,7 @@ fn main() {
     let image_width = 1280;
     let image_height = ((image_width as f64) / aspect_ratio) as u32;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
     let world = Scene {
@@ -64,7 +74,7 @@ fn main() {
                 let sy = (y as f64) + dy;
                 let u = sx / ((image_width as f64) - 1.);
                 let v = sy / ((image_height as f64) - 1.);
-                let Color(c) = ray_color(&cam.get_ray(u, v), &world);
+                let Color(c) = ray_color(&cam.get_ray(u, v), &world, max_depth);
                 avg_color += c;
             }
             avg_color /= sample_displacement.len() as f64;
