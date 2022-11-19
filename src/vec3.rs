@@ -47,6 +47,10 @@ impl Vec3 {
         *self / self.length()
     }
 
+    pub fn near_zero(&self) -> bool {
+        self.e.iter().all(|x| x.abs() < 1e-8)
+    }
+
     pub unsafe fn get_unchecked(&self, i: usize) -> &f64 {
         debug_assert!(i < 3);
         self.e.get_unchecked(i)
