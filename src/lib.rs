@@ -71,6 +71,7 @@ impl HitRecord {
 }
 
 pub trait Hittable {
+    // Hit only counts if t in [t_min, t_max)
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
