@@ -12,6 +12,7 @@ pub mod scene;
 pub use scene::Scene;
 pub mod camera;
 pub use camera::Camera;
+pub mod material;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Ray {
